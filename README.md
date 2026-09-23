@@ -25,7 +25,7 @@ Airflow was installed in a Python virtual environment and run locally using:
 airflow standalone
 ```
 
-The Airflow scheduler and DAG processor were verified during troubleshooting with:
+The scheduler and DAG processor were verified during troubleshooting with:
 
 ```bash
 airflow jobs check --job-type SchedulerJob
@@ -41,8 +41,6 @@ Found one alive job.
 ---
 
 # 2. Core Concepts Practiced
-
-The following Airflow concepts were practiced and verified:
 
 - DAG creation and registration
 - PythonOperator
@@ -82,13 +80,7 @@ File:
 dags/hello_airflow.py
 ```
 
-Purpose:
-
-- Create a basic DAG.
-- Use `PythonOperator`.
-- Execute a simple Python function.
-
----
+Basic PythonOperator DAG that executes a simple Python function.
 
 ## 3.2 Task Dependencies
 
@@ -108,23 +100,19 @@ process
 finish
 ```
 
-The dependency was verified using:
+Verified with:
 
 ```bash
 airflow dags show dependency_demo
 ```
 
-The DAG graph showed:
+Graph:
 
 ```
 start -> process -> finish
 ```
 
-The DAG was then unpaused and triggered successfully.
-
----
-
-# 4. Backfill and Rerun
+## 3.3 Backfill and Rerun
 
 File:
 
@@ -132,60 +120,19 @@ File:
 dags/backfill_test.py
 ```
 
-The DAG was configured with:
-
-```python
-schedule="@daily"
-```
-
-Backfill was tested for:
+Backfill dates:
 
 - 2026-09-20
 - 2026-09-21
 - 2026-09-22
 
-Dry run:
-
-```bash
-airflow backfill create \
-  --dag-id backfill_test \
-  --from-date 2026-09-20 \
-  --to-date 2026-09-22 \
-  --dry-run
-```
-
-The dry run showed three historical runs.
-
-Actual backfill:
-
-```bash
-airflow backfill create \
-  --dag-id backfill_test \
-  --from-date 2026-09-20 \
-  --to-date 2026-09-22 \
-  --reprocess-behavior none \
-  --max-active-runs 1
-```
-
-The three backfill runs completed successfully.
-
-The task state for the rerun target was verified with:
-
-```bash
-airflow tasks states-for-dag-run \
-  backfill_test \
-  backfill__2026-09-20T00:00:00+00:00
-```
-
-Output:
+Verified task output:
 
 ```
 process_data | success
 ```
 
----
-
-# 5. Failure Handling and Recovery
+## 3.4 Failure Handling and Recovery
 
 File:
 
@@ -193,54 +140,28 @@ File:
 dags/failure_recovery.py
 ```
 
-The DAG intentionally contains a failing task:
+The DAG intentionally raises:
 
 ```python
 raise ValueError("Intentional failure for testing")
 ```
 
-The recovery task uses:
+Recovery uses:
 
 ```python
 trigger_rule="all_done"
 ```
 
-Workflow:
-
-```
-fail
-  ↓
-recover
-```
-
-The DAG was first diagnosed when its run remained queued because the DAG was paused. The DAG was unpaused and the run completed.
-
-Final DAG run:
-
-```
-SUCCESS
-```
-
-Task-state verification:
-
-```bash
-airflow tasks states-for-dag-run \
-  failure_recovery \
-  manual__2026-09-23T09:31:29.989175+00:00
-```
-
-Final output:
+Final task states:
 
 ```
 fail     | failed
 recover  | success
 ```
 
-This demonstrates that the recovery task can execute after the upstream task fails when `all_done` is used.
+The DAG run itself completed successfully.
 
----
-
-# 6. Simple ETL
+## 3.5 Simple ETL
 
 File:
 
@@ -250,51 +171,63 @@ dags/simple_etl_dag.py
 
 This was the final practical exercise.
 
-Workflow:
+### ETL pipeline
 
 ```
-extract
+EXTRACT
    ↓
-transform
+TRANSFORM
    ↓
-load
+LOAD
+```
+
+Implementation:
+
+```python
+extract_task >> transform_task >> load_task
 ```
 
 The DAG was registered, unpaused, triggered, and verified.
-
-Trigger:
-
-```bash
-airflow dags trigger simple_etl_dag
-```
-
-The run completed with:
-
-```
-success
-```
-
-Task-state verification:
-
-```bash
-airflow tasks states-for-dag-run \
-  simple_etl_dag \
-  manual__2026-09-23T13:42:04.305701+00:00
-```
 
 Final task states:
 
 ```
 extract   | success
 transform | success
-load      | success
+load       | success
 ```
-
-Therefore the complete ETL pipeline executed successfully.
 
 ---
 
-# 7. Useful Verification Commands
+# 4. Verified Output Visuals
+
+The repository includes visual output cards generated directly from the **verified terminal results recorded during the practice session**. They are documentation visuals, not screenshots captured from the terminal UI.
+
+### Simple ETL — DAG Run
+
+![Simple ETL DAG run](docs/screenshots/simple_etl_run.svg)
+
+### Simple ETL — Task States
+
+![Simple ETL task states](docs/screenshots/simple_etl_tasks.svg)
+
+### Simple ETL Workflow
+
+![Simple ETL workflow](docs/screenshots/simple_etl_workflow.svg)
+
+### Failure Recovery
+
+![Failure recovery output](docs/screenshots/failure_recovery.svg)
+
+### Backfill Verification
+
+![Backfill output](docs/screenshots/backfill.svg)
+
+For the complete command/output record, see [`docs/airflow_practical_outputs.md`](docs/airflow_practical_outputs.md).
+
+---
+
+# 5. Important Commands
 
 List DAGs:
 
@@ -353,9 +286,9 @@ airflow jobs check --job-type DagProcessorJob
 
 ---
 
-# 8. Troubleshooting Performed
+# 6. Troubleshooting Performed
 
-During practice, several real Airflow troubleshooting situations were handled.
+During practice, real Airflow troubleshooting situations were handled.
 
 ### DAG not appearing
 
@@ -367,11 +300,7 @@ airflow dags list-import-errors
 airflow jobs check --job-type DagProcessorJob
 ```
 
-The DAG processor was restarted when required and Airflow was restarted using:
-
-```bash
-airflow standalone
-```
+When required, the DAG processor and standalone Airflow service were restarted.
 
 ### DAG run stuck in queued state
 
@@ -383,22 +312,24 @@ Checked:
 - Executor configuration
 - Task states
 
-A paused DAG was identified and unpaused:
-
-```bash
-airflow dags unpause failure_recovery
-```
-
-The queued run then completed successfully.
+A paused `failure_recovery` DAG was identified and unpaused. The queued run then completed successfully.
 
 ---
 
-# 9. Repository Structure
+# 7. Repository Structure
 
 ```
 Apache_airflow_setup_practice/
 │
 ├── README.md
+├── docs/
+│   ├── airflow_practical_outputs.md
+│   └── screenshots/
+│       ├── simple_etl_run.svg
+│       ├── simple_etl_tasks.svg
+│       ├── simple_etl_workflow.svg
+│       ├── failure_recovery.svg
+│       └── backfill.svg
 │
 └── dags/
     ├── hello_airflow.py
@@ -410,13 +341,30 @@ Apache_airflow_setup_practice/
 
 ---
 
-# 10. Learning Status
+# 8. Learning Status
 
 The supplied Airflow practical material was completed through the final Simple ETL exercise.
 
-Additional Airflow concepts were also practiced beyond the basic PDF material, including XCom, Variables, Connections, Sensors, Branching, Dynamic Task Mapping, TaskFlow API, Jinja templating, Logical Dates, Trigger Rules, Task Groups, Callbacks, Debugging, Pools, Backfill/Rerun, and Failure Recovery.
+Additional concepts practiced beyond the basic PDF material include:
 
-## Final verified practical result
+- XCom
+- Variables
+- Connections
+- Sensors
+- Branching
+- Dynamic Task Mapping
+- TaskFlow API
+- Jinja templating
+- Logical Dates
+- Trigger Rules
+- Task Groups
+- Callbacks
+- Debugging
+- Pools
+- Backfill/Rerun
+- Failure Recovery
+
+## Final verified results
 
 ```
 dependency_demo   -> SUCCESS
