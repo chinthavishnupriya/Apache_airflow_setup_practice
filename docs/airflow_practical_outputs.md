@@ -1,72 +1,44 @@
 # Airflow Practical Outputs
 
-This document records the important CLI commands and verified results from the Apache Airflow practice sessions.
+This document records verified Apache Airflow practice results and the corresponding UI evidence supplied during the practice session.
 
-## Environment Verification
+## Environment
 
-### Scheduler
+- Apache Airflow: 3.3.2
+- Python: 3.11.x
+- OS: Ubuntu/Linux
+- AIRFLOW_HOME: `~/airflow`
+- DAG folder: `~/airflow/dags`
+- Local UI: `http://localhost:8080`
+- Executor: LocalExecutor
 
-Command:
+## Hello Airflow
 
-```bash
-airflow jobs check --job-type SchedulerJob
-```
+The `hello_airflow` DAG was triggered manually and completed successfully.
 
-Result:
+Verified UI evidence:
+- `hello_airflow_run_success.png`
+- `hello_airflow_task_logs.png`
 
-```
-Found one alive job.
-```
+The task log shows the Python task output:
+`Hello from Airflow!`
 
-### DAG Processor
+## Task Dependencies
 
-Command:
-
-```bash
-airflow jobs check --job-type DagProcessorJob
-```
-
-Result:
-
-```
-Found one alive job.
-```
-
----
-
-## Dependency Demo
-
-Command:
-
-```bash
-airflow dags show dependency_demo
-```
-
-Verified graph:
+DAG:
 
 ```
 start -> process -> finish
 ```
 
-After unpausing and triggering, the DAG run completed successfully.
+The dependency workflow was triggered and completed successfully.
 
----
+Evidence:
+- `dependency_demo_tasks.png`
 
-## Backfill
+## Backfill and Rerun
 
-Command:
-
-```bash
-airflow backfill create \
-  --dag-id backfill_test \
-  --from-date 2026-09-20 \
-  --to-date 2026-09-22 \
-  --dry-run
-```
-
-Result: three historical runs were identified.
-
-The actual backfill created runs for:
+Backfill was tested for:
 
 ```
 2026-09-20
@@ -74,92 +46,82 @@ The actual backfill created runs for:
 2026-09-22
 ```
 
-All three completed successfully.
+All three backfill runs completed successfully.
 
 Rerun verification:
 
-```bash
+```
 airflow tasks states-for-dag-run backfill_test backfill__2026-09-20T00:00:00+00:00
 ```
 
-Output:
+Result:
 
 ```
 process_data | success
 ```
 
----
+Evidence:
+- `backfill_task_log.png`
+- `backfill_run_success.png`
+- `backfill_dag_overview.png`
+
+## Failure Handling and Debugging
+
+An intentional task failure was used to verify Airflow failure handling and logs.
+
+Evidence:
+- `failure_task_alert.png`
+- `failure_task_error.png`
+
+The logs show the task entering the failed state and the intentional exception.
 
 ## Failure Recovery
 
-DAG:
+The `failure_recovery` DAG uses:
 
-```
-failure_recovery
-```
-
-Run:
-
-```
-manual__2026-09-23T09:31:29.989175+00:00
+```python
+trigger_rule="all_done"
 ```
 
-Final task states:
+Verified result:
 
 ```
 fail     | failed
 recover  | success
 ```
 
-Final DAG run:
+The recovery workflow completed successfully.
 
-```
-success
-```
+Evidence:
+- `failure_recovery.png`
 
-Important configuration:
+## Pools and Concurrency
 
-```python
-trigger_rule="all_done"
-```
+The pool exercise demonstrated tasks running according to the configured pool capacity.
 
-This confirmed that the recovery task ran after the intentional upstream failure.
+Evidence:
+- `pool_running.png`
+- `pool_completed.png`
 
----
+## Dynamic Task Mapping / ETL-Style Workflow
 
-## Simple ETL
+The supplied UI evidence shows mapped extract/transform/load task instances completing successfully.
 
-DAG:
+Evidence:
+- `dynamic_etl_mapped_tasks.png`
 
-```
-simple_etl_dag
-```
+## Other Airflow Features
 
-Workflow:
+Additional supplied evidence covers:
 
-```
-extract -> transform -> load
-```
+- Airflow home/health: `airflow_home.png`
+- DAG list: `dag_list.png`
+- BashOperator and logical-date output: `bash_operator_output.png`
+- TaskFlow API output: `taskflow_output.png`
 
-Trigger:
+## Final Simple ETL Verification
 
-```bash
-airflow dags trigger simple_etl_dag
-```
-
-Run:
-
-```
-manual__2026-09-23T13:42:04.305701+00:00
-```
-
-DAG run result:
-
-```
-success
-```
-
-Task verification:
+The final `simple_etl_dag` was also verified from the terminal:
 
 ```
 extract   | success
@@ -167,61 +129,49 @@ transform | success
 load      | success
 ```
 
-This is the final verified ETL result.
-
----
-
-## DAG Registration
-
-Example command:
-
-```bash
-airflow dags list | grep simple_etl_dag
-```
-
-Verified after Airflow/DAG-processor restart:
+DAG run:
 
 ```
-simple_etl_dag | /home/vishnupriya/airflow/dags/simple_etl_dag.py | airflow | False
+manual__2026-09-23T13:42:04.305701+00:00
 ```
 
-`False` indicates the DAG was unpaused.
+### Missing screenshot
 
----
+A dedicated UI screenshot of this final `simple_etl_dag` run was **not included in the screenshots supplied in the conversation**.
 
-## Import Error Check
+To capture it:
 
-Command:
+```
+Airflow UI
+  -> DAGs
+  -> simple_etl_dag
+  -> latest successful run
+  -> Task Instances
+```
+
+Capture the page showing `extract`, `transform`, and `load` as **Success**, then save it as:
+
+```
+docs/screenshots/simple_etl_final.png
+```
+
+## Import and Service Checks
+
+Useful verification commands used during practice:
 
 ```bash
 airflow dags list-import-errors
+airflow jobs check --job-type SchedulerJob
+airflow jobs check --job-type DagProcessorJob
 ```
 
-Result during the ETL setup:
+The DAG import check returned:
 
 ```
 No data found
 ```
 
-This confirmed that Airflow reported no DAG import errors.
-
----
-
-## Commands Used Throughout Practice
-
-```bash
-airflow dags list
-airflow dags show <dag_id>
-airflow dags trigger <dag_id>
-airflow dags list-runs <dag_id>
-airflow dags unpause <dag_id>
-airflow dags pause <dag_id>
-airflow dags list-import-errors
-airflow tasks states-for-dag-run <dag_id> <run_id>
-airflow jobs check --job-type SchedulerJob
-airflow jobs check --job-type DagProcessorJob
-airflow backfill create ...
-```
+Scheduler and DAG processor health were also verified during troubleshooting.
 
 ## Final Verified DAG Results
 
