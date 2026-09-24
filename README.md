@@ -238,3 +238,23 @@ start ──────────────┤                         ├�
 ```
 
 All six DAGs were tested locally and the Customer-360 final run completed successfully.
+## Airflow Output Screenshots
+
+### Backfill Test
+![Backfill Test](docs/screenshots/backfill.svg)
+
+### Failure Recovery
+![Failure Recovery](docs/screenshots/failure_recovery.svg)
+
+### Simple ETL Run
+![Simple ETL Run](docs/screenshots/simple_etl_run.svg)
+
+### Simple ETL Tasks
+![Simple ETL Tasks](docs/screenshots/simple_etl_tasks.svg)
+
+### Simple ETL Workflow
+![Simple ETL Workflow](docs/screenshots/simple_etl_workflow.svg)
+
+### Exercise Outputs
+
+The repository also contains the completed DAG source files for Exercises 1–4 and the Customer-360 mini project. The corresponding Airflow UI screenshots from the practice session can be added under `docs/screenshots/` when available as image files.
