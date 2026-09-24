@@ -88,31 +88,15 @@ load      | success
 
 ## Actual Airflow UI Evidence
 
-The repository documentation maps the original Airflow UI screenshots supplied during the practice session to the corresponding concepts.
+The repository will contain the original Airflow UI screenshots from the practice session, rather than generated diagrams.
 
-Screenshots are stored under:
+Screenshots will be stored under:
 
 ```text
 docs/screenshots/
 ```
 
-Evidence includes:
-
-- Airflow home/health
-- Hello Airflow successful run and task logs
-- Task dependency execution
-- Backfill and rerun
-- Pool/concurrency execution
-- DAG listing
-- Failure debugging logs
-- Failure recovery
-- Dynamic task mapping / ETL-style execution
-- BashOperator
-- TaskFlow API
-
-See [`docs/airflow_practical_outputs.md`](docs/airflow_practical_outputs.md) for the evidence-to-concept mapping and final verification results.
-
-> **Screenshot note:** The actual PNG screenshots supplied in the practice conversation are prepared for upload separately. A dedicated screenshot for the final `simple_etl_dag` run is still missing; the exact Airflow UI location is documented in `docs/airflow_practical_outputs.md`.
+See [`docs/airflow_practical_outputs.md`](docs/airflow_practical_outputs.md) for the evidence-to-concept mapping.
 
 ---
 
@@ -165,6 +149,7 @@ simple_etl_dag    -> SUCCESS
 ```
 
 All documented DAGs were developed and verified locally with Apache Airflow 3.3.2.
+
 ---
 
 ## Exercises 1–4 and Customer-360 Mini Project
@@ -182,6 +167,7 @@ dags/
 ```
 
 ### Exercise 1
+
 `hello_workflow.py`
 
 Workflow:
@@ -191,11 +177,13 @@ start → student_name → course_name → end
 ```
 
 ### Exercise 2
+
 `daily_sales.py` — daily schedule at 09:00.
 
 `weekly_customer_report.py` — weekly schedule on Monday at 08:00.
 
 ### Exercise 3
+
 `customer_pipeline.py`
 
 Workflow:
@@ -207,6 +195,7 @@ start ────────┤                   ├──→ load_data → f
 ```
 
 ### Exercise 4
+
 `etl_ui_practice.py`
 
 Workflow:
@@ -218,6 +207,7 @@ extract → transform → load → notify
 Practiced Graph View, task logs, intentional failure, and recovery.
 
 ### Exercise 5 — Customer-360 Mini Project
+
 `customer360.py`
 
 Workflow:
@@ -238,23 +228,11 @@ start ──────────────┤                         ├�
 ```
 
 All six DAGs were tested locally and the Customer-360 final run completed successfully.
-## Airflow Output Screenshots
 
-### Backfill Test
-![Backfill Test](docs/screenshots/backfill.svg)
+---
 
-### Failure Recovery
-![Failure Recovery](docs/screenshots/failure_recovery.svg)
+## Airflow UI Screenshots
 
-### Simple ETL Run
-![Simple ETL Run](docs/screenshots/simple_etl_run.svg)
+Original screenshots from the Airflow UI will be added here under `docs/screenshots/`.
 
-### Simple ETL Tasks
-![Simple ETL Tasks](docs/screenshots/simple_etl_tasks.svg)
-
-### Simple ETL Workflow
-![Simple ETL Workflow](docs/screenshots/simple_etl_workflow.svg)
-
-### Exercise Outputs
-
-The repository also contains the completed DAG source files for Exercises 1–4 and the Customer-360 mini project. The corresponding Airflow UI screenshots from the practice session can be added under `docs/screenshots/` when available as image files.
+They will show the actual UI evidence for the completed exercises and practical work, not generated SVG diagrams.
