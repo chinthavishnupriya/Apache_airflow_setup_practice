@@ -165,3 +165,76 @@ simple_etl_dag    -> SUCCESS
 ```
 
 All documented DAGs were developed and verified locally with Apache Airflow 3.3.2.
+---
+
+## Exercises 1–4 and Customer-360 Mini Project
+
+Completed Airflow exercises and capstone DAGs:
+
+```text
+dags/
+├── hello_workflow.py
+├── daily_sales.py
+├── weekly_customer_report.py
+├── customer_pipeline.py
+├── etl_ui_practice.py
+└── customer360.py
+```
+
+### Exercise 1
+`hello_workflow.py`
+
+Workflow:
+
+```text
+start → student_name → course_name → end
+```
+
+### Exercise 2
+`daily_sales.py` — daily schedule at 09:00.
+
+`weekly_customer_report.py` — weekly schedule on Monday at 08:00.
+
+### Exercise 3
+`customer_pipeline.py`
+
+Workflow:
+
+```text
+              ┌── validate_data ──┐
+start ────────┤                   ├──→ load_data → finish
+              └── clean_data ─────┘
+```
+
+### Exercise 4
+`etl_ui_practice.py`
+
+Workflow:
+
+```text
+extract → transform → load → notify
+```
+
+Practiced Graph View, task logs, intentional failure, and recovery.
+
+### Exercise 5 — Customer-360 Mini Project
+`customer360.py`
+
+Workflow:
+
+```text
+                    ┌── ingest_crm ──────────┐
+                    ├── ingest_transactions ──┤
+start ──────────────┤                         ├──→ process_customer_data
+                    └── ingest_support ───────┘
+                                                     ↓
+                                              spark_processing
+                                                     ↓
+                                                 load_hive
+                                                     ↓
+                                                load_hbase
+                                                     ↓
+                                             notify_downstream
+```
+
+All six DAGs were tested locally and the Customer-360 final run completed successfully.
