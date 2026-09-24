@@ -88,12 +88,20 @@ load      | success
 
 ## Actual Airflow UI Evidence
 
-The repository will contain the original Airflow UI screenshots from the practice session, rather than generated diagrams.
-
-Screenshots will be stored under:
+The repository contains an organized location for the original Airflow UI screenshots from the practice session.
 
 ```text
 docs/screenshots/
+├── exercise-1/
+│   └── hello_workflow screenshots
+├── exercise-2/
+│   └── daily_sales + weekly_customer_report screenshots
+├── exercise-3/
+│   └── customer_pipeline screenshots
+├── exercise-4/
+│   └── etl_ui_practice screenshots
+└── mini-project/
+    └── customer360 screenshots
 ```
 
 See [`docs/airflow_practical_outputs.md`](docs/airflow_practical_outputs.md) for the evidence-to-concept mapping.
@@ -233,6 +241,4 @@ All six DAGs were tested locally and the Customer-360 final run completed succes
 
 ## Airflow UI Screenshots
 
-Original screenshots from the Airflow UI will be added here under `docs/screenshots/`.
-
-They will show the actual UI evidence for the completed exercises and practical work, not generated SVG diagrams.
+The generated SVG screenshots have been removed. The folders above are reserved for the original Airflow UI screenshots supplied during the practice session.
