@@ -1,6 +1,6 @@
 # Apache Airflow Setup & Practice
 
-A practical Apache Airflow learning repository documenting setup, concepts, DAG development, debugging, execution, backfill/rerun, failure recovery, pools, and ETL workflow verification.
+A practical Apache Airflow learning repository documenting setup, DAG development, scheduling, dependencies, UI troubleshooting, failure recovery, and an end-to-end Customer-360 workflow.
 
 ## Environment
 
@@ -15,98 +15,105 @@ A practical Apache Airflow learning repository documenting setup, concepts, DAG 
 | Web UI / API | `http://localhost:8080` |
 | Executor | LocalExecutor |
 
----
+## Practical Exercises
 
-## Core Concepts Practiced
+The repository follows the supplied Airflow practical exercise sheet.
 
-- DAG creation and registration
-- PythonOperator
-- Task dependencies
-- Manual DAG triggering
-- Scheduling and cron expressions
-- Retries
-- Task timeouts
-- BashOperator
-- Variables
-- Connections
-- Sensors
-- Branching
-- Dynamic Task Mapping
-- TaskFlow API
-- Jinja templating
-- Logical dates and data intervals
-- Trigger rules
-- Task Groups
-- Callbacks
-- Task testing and debugging
-- Pools and task concurrency
-- Backfill
-- Rerun
-- Failure handling and recovery
-- Simple ETL workflow
+### Exercise 1 — First Workflow
 
----
+File: `dags/exercises/exercise_1/hello_workflow.py`
 
-## DAG Practice Files
+Workflow: `start → student_name → course_name → end`
+
+### Exercise 2 — Cron to Airflow Scheduling
+
+- `dags/exercises/exercise_2/daily_sales.py` — daily at 09:00
+- `dags/exercises/exercise_2/weekly_customer_report.py` — Monday at 08:00
+
+### Exercise 3 — Dependencies and Parallel Execution
+
+File: `dags/exercises/exercise_3/customer_pipeline.py`
+
+Workflow:
+```text
+              ┌── validate_data ──┐
+start ────────┤                   ├──→ load_data → finish
+              └── clean_data ─────┘
+```
+
+The failure scenario was also tested by intentionally failing `clean_data`.
+
+### Exercise 4 — Airflow UI and Failure Investigation
+
+File: `dags/exercises/exercise_4/etl_ui_practice.py`
+
+Workflow: `extract → transform → load → notify`
+
+Practiced Graph View, Tree View, task logs, intentional failure, downstream impact, and recovery.
+
+### Exercise 5 — Customer-360 Mini Capstone
+
+- `dags/exercises/exercise_5/customer360.py` — BashOperator version
+- `dags/exercises/exercise_5/customer360_taskflow.py` — TaskFlow API version
+
+Workflow:
+```text
+CRM ───────────────┐
+Transactions ─────┼──→ Process → Spark → Hive → HBase → Notify
+Support ──────────┘
+```
+
+The TaskFlow version was tested successfully and demonstrates automatic XCom data passing through task return values.
+
+## Repository Structure
 
 ```text
 dags/
-├── hello_airflow.py
-├── dependency_demo.py
+├── exercises/
+│   ├── exercise_1/
+│   │   └── hello_workflow.py
+│   ├── exercise_2/
+│   │   ├── daily_sales.py
+│   │   └── weekly_customer_report.py
+│   ├── exercise_3/
+│   │   └── customer_pipeline.py
+│   ├── exercise_4/
+│   │   └── etl_ui_practice.py
+│   └── exercise_5/
+│       ├── customer360.py
+│       └── customer360_taskflow.py
 ├── backfill_test.py
+├── dependency_demo.py
 ├── failure_recovery.py
-└── simple_etl_dag.py
+├── hello_airflow.py
+├── hello_three.py
+├── pool_test.py
+├── simple_etl_dag.py
+└── test_debug.py
 ```
 
-### Simple ETL
+## Core Airflow Concepts Practiced
 
-Workflow:
-
-```text
-EXTRACT
-   ↓
-TRANSFORM
-   ↓
-LOAD
-```
-
-Implementation:
-
-```python
-extract_task >> transform_task >> load_task
-```
-
-Verified final result:
-
-```text
-extract   | success
-transform | success
-load      | success
-```
-
----
-
-## Actual Airflow UI Evidence
-
-The repository contains an organized location for the original Airflow UI screenshots from the practice session.
-
-```text
-docs/screenshots/
-├── exercise-1/
-│   └── hello_workflow screenshots
-├── exercise-2/
-│   └── daily_sales + weekly_customer_report screenshots
-├── exercise-3/
-│   └── customer_pipeline screenshots
-├── exercise-4/
-│   └── etl_ui_practice screenshots
-└── mini-project/
-    └── customer360 screenshots
-```
-
-See [`docs/airflow_practical_outputs.md`](docs/airflow_practical_outputs.md) for the evidence-to-concept mapping.
-
----
+- DAG creation and registration
+- Task dependencies
+- Sequential and parallel execution
+- BashOperator
+- Scheduling and cron expressions
+- Retries and task timeouts
+- Variables and Connections
+- Sensors and Branching
+- Dynamic Task Mapping
+- TaskFlow API
+- XCom through TaskFlow return values
+- Jinja templating
+- Logical dates and data intervals
+- Trigger rules and Task Groups
+- Callbacks
+- Task testing and debugging
+- Pools and task concurrency
+- Backfill and rerun
+- Failure handling and recovery
+- Airflow Graph View, Tree View, and Logs
 
 ## Important Commands
 
@@ -123,122 +130,16 @@ airflow jobs check --job-type SchedulerJob
 airflow jobs check --job-type DagProcessorJob
 ```
 
-Backfill:
+Test a DAG:
 
 ```bash
-airflow backfill create --dag-id backfill_test --from-date 2026-09-20 --to-date 2026-09-22
+airflow dags test <dag_id> 2026-09-24
 ```
 
----
+## Verification
 
-## Troubleshooting Performed
+The exercise DAGs were tested locally with Apache Airflow 3.3.2. The Customer-360 TaskFlow test completed with a successful DAG run.
 
-During practice, real Airflow troubleshooting situations were handled:
+## UI Evidence
 
-- DAG not appearing in the DAG list
-- DAG processor restart
-- Scheduler health verification
-- DAG pause/unpause
-- DAG run stuck in queued state
-- Import-error verification
-- Task-state inspection
-- Failure log inspection
-- Intentional failure and recovery
-
----
-
-## Final Verified Results
-
-```text
-dependency_demo   -> SUCCESS
-backfill_test     -> SUCCESS
-failure_recovery  -> SUCCESS
-simple_etl_dag    -> SUCCESS
-```
-
-All documented DAGs were developed and verified locally with Apache Airflow 3.3.2.
-
----
-
-## Exercises 1–4 and Customer-360 Mini Project
-
-Completed Airflow exercises and capstone DAGs:
-
-```text
-dags/
-├── hello_workflow.py
-├── daily_sales.py
-├── weekly_customer_report.py
-├── customer_pipeline.py
-├── etl_ui_practice.py
-└── customer360.py
-```
-
-### Exercise 1
-
-`hello_workflow.py`
-
-Workflow:
-
-```text
-start → student_name → course_name → end
-```
-
-### Exercise 2
-
-`daily_sales.py` — daily schedule at 09:00.
-
-`weekly_customer_report.py` — weekly schedule on Monday at 08:00.
-
-### Exercise 3
-
-`customer_pipeline.py`
-
-Workflow:
-
-```text
-              ┌── validate_data ──┐
-start ────────┤                   ├──→ load_data → finish
-              └── clean_data ─────┘
-```
-
-### Exercise 4
-
-`etl_ui_practice.py`
-
-Workflow:
-
-```text
-extract → transform → load → notify
-```
-
-Practiced Graph View, task logs, intentional failure, and recovery.
-
-### Exercise 5 — Customer-360 Mini Project
-
-`customer360.py`
-
-Workflow:
-
-```text
-                    ┌── ingest_crm ──────────┐
-                    ├── ingest_transactions ──┤
-start ──────────────┤                         ├──→ process_customer_data
-                    └── ingest_support ───────┘
-                                                     ↓
-                                              spark_processing
-                                                     ↓
-                                                 load_hive
-                                                     ↓
-                                                load_hbase
-                                                     ↓
-                                             notify_downstream
-```
-
-All six DAGs were tested locally and the Customer-360 final run completed successfully.
-
----
-
-## Airflow UI Screenshots
-
-The generated SVG screenshots have been removed. The folders above are reserved for the original Airflow UI screenshots supplied during the practice session.
+The original Airflow UI screenshots were captured during the practical session. The `docs/screenshots/` area is reserved for practice evidence. Generated SVG screenshots are not presented as the original Airflow UI screenshots.
